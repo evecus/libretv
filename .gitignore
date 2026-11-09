@@ -1,0 +1,14 @@
+/target
+/web/node_modules
+/web/.next
+/web/out
+/.web-api-stash
+*.log
+.DS_Store
+# 运行时产物：SQLite 数据目录与导出的二进制不入库
+/data
+*.db
+*.db-wal
+*.db-shm
+/libretv-rs-linux-*
+/.env
