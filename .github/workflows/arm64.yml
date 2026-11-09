@@ -19,10 +19,9 @@ jobs:
           node-version: '20'
 
       - name: Build web
-        working-directory: web
         run: |
-          npm install --no-audit --no-fund
-          npm run build
+          chmod 755 ./scripts/build-web.sh
+          ./scripts/build-web.sh
 
       # ── 2. Rust 工具链（stable，支持 edition 2024）────────────────────────
       - name: Set up Rust toolchain
