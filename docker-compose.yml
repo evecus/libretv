@@ -1,0 +1,31 @@
+services:
+  libretv:
+    build: .
+    image: libretv-rs:local
+    container_name: libretv-rs
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      # 服务端持久化：源配置/订阅/设置/播放历史/进度/搜索记录
+      # 缓存不落盘，此卷只含 libretv.db（+ WAL/SHM）
+      - libretv-data:/data
+    environment:
+      PASSWORD: change-me            # 必填
+      DATA_DIR: /data                # SQLite 数据目录（镜像内已声明 VOLUME）
+      # PROXY_SECRET: your-secret    # 多实例部署建议显式设置
+      # DEFAULT_SOURCES: '[{"name":"示例源","url":"https://example.com/api.php/provide/vod"}]'
+      # DEFAULT_LIVE_SOURCES: '[{"name":"直播源","url":"https://example.com/list.m3u"}]'
+      # DEFAULT_SUBSCRIPTIONS: '["https://example.com/sources.json"]'
+      # DEFAULT_RECOMMEND_SOURCE: douban
+      # DEFAULT_IMAGE_MODE: proxy
+      # LIVE_ALLOW_PRIVATE: "1"     # 自建内网 IPTV 源时开启
+      # REQUEST_TIMEOUT: "8000"
+      # SEARCH_MAX_PAGES: "5"
+      # SEARCH_SOURCE_TIMEOUT_MS: "10000"
+      # USER_AGENT: Mozilla/5.0 ...
+      # COOKIE_SECURE: "true"       # 反代终结 TLS 但未传 x-forwarded-proto 时
+    # 反代终结 TLS 时建议传入 x-forwarded-proto，cookie 的 Secure 标记会自动推导
+
+volumes:
+  libretv-data:

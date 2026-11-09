@@ -1,0 +1,59 @@
+[package]
+name = "libretv"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "AGPL-3.0-or-later"
+description = "LibreTV 的 Rust 后端实现：前端静态产物内嵌，单二进制运行，运行时不依赖 Node.js"
+
+# 所有 TLS 走 rustls + webpki-roots（CA 内嵌），避免交叉编译时链接系统 OpenSSL。
+# 这是多平台多架构发布能落地的前提。
+
+[dependencies]
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "query", "tokio", "form"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "signal", "time", "macros", "sync", "fs", "io-util"] }
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls", "stream", "gzip", "brotli", "json", "charset", "http2",
+] }
+
+rust-embed = { version = "8", features = ["debug-embed", "compression"] }
+mime_guess = "2"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+url = "2"
+percent-encoding = "2"
+
+hmac = "0.12"
+sha2 = "0.10"
+subtle = "2"
+hex = "0.4"
+base64 = "0.22"
+chrono = { version = "0.4", features = ["clock"] }
+
+moka = { version = "0.12", features = ["future"] }
+dashmap = "6"
+# 服务端持久化：SQLite 静态编译进二进制（bundled），运行时无外部数据库进程
+rusqlite = { version = "0.32", features = ["bundled"] }
+futures-util = "0.3"
+async-stream = "0.3"
+bytes = "1"
+flate2 = "1"
+roxmltree = "0.20"
+regex = "1"
+encoding_rs = "0.8"   # 采集站 GBK 响应
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1"
+thiserror = "2"
+clap = { version = "4", features = ["derive", "env"] }
+
+[profile.release]
+opt-level = "s"        # 单二进制体积优先
+lto = true
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
